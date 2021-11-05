@@ -1,0 +1,95 @@
+<form novalidate #myForm="ngForm">
+  <kendo-grid
+    [data]="(view)!"
+    [height]="400"
+    [pageSize]="gridState.take!"
+    [skip]="gridState.skip!"
+    [pageable]="true"
+    [sortable]="false"
+    (dataStateChange)="onStateChange($event)"
+    (edit)="editHandler($event)"
+    (cancel)="cancelHandler($event)"
+    (save)="saveHandler($event)"
+    (remove)="removeHandler($event)"
+    [navigable]="true"
+  >
+    <kendo-grid-column field="firstName" title="First Name">
+      <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+        <input
+          [(ngModel)]="dataItem.firstName"
+          kendoGridFocusable
+          name="First Name"
+          class="k-textbox"
+          required
+        />
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="lastName" title="Last Name">
+      <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+        <input
+          [(ngModel)]="dataItem.lastName"
+          kendoGridFocusable
+          name="Last Name"
+          class="k-textbox"
+          required
+        />
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="email" title="Email">
+      <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+        <input
+          [(ngModel)]="dataItem.email"
+          kendoGridFocusable
+          name="Email"
+          class="k-textbox"
+          type="email"
+          required
+        />
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="dateOfBirth" editor="date" title="Date Of Birth">
+      <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+        <input
+          [(ngModel)]="dataItem.dateOfBirth"
+          kendoGridFocusable
+          name="DateOfBirth"
+          class="k-textbox"
+          type="date"
+        />
+      </ng-template>
+    </kendo-grid-column>
+  <kendo-grid-column field="age" editor="numeric" title="Age">
+      <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+        <input
+          [(ngModel)]="dataItem.age"
+          kendoGridFocusable
+          name="Age"
+          required
+          min="0"
+          max="99"
+          class="k-textbox"
+          type="number"
+          [disabled] = "true"
+        />
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-command-column title="" [width]="220">
+      <ng-template kendoGridCellTemplate let-isNew="isNew">
+        <button kendoGridEditCommand type="button" [primary]="true">
+          Edit
+        </button>
+        <button kendoGridRemoveCommand type="button">Remove</button>
+        <button
+          kendoGridSaveCommand
+          type="button"
+          [disabled]="myForm.invalid! || myForm.pristine!" 
+        >
+          {{ isNew ? "Add" : "Update" }}
+        </button>
+        <button kendoGridCancelCommand type="button">
+          {{ isNew ? "Discard changes" : "Cancel" }}
+        </button>
+      </ng-template>
+    </kendo-grid-command-column>
+  </kendo-grid>
+</form>

@@ -60,7 +60,6 @@ export class StudentsComponent implements OnInit {
     }
 
     public cancelHandler({sender, rowIndex}: {sender : GridComponent, rowIndex: number}) {
-        this.resetItem(this.editedStudent);
         this.closeEditor(sender, rowIndex);
     }
 
@@ -125,7 +124,7 @@ export class StudentsComponent implements OnInit {
     
         // find orignal data item
         const originalDataItem = this.originalItems.find(
-          (item) => item.Id === dataItem.Id
+          (item) => item.id === dataItem.id
         );
     
         // revert changes

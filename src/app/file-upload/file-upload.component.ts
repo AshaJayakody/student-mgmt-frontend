@@ -1,8 +1,9 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { FileInfo, FileRestrictions, FileState } from '@progress/kendo-angular-upload';
-import { FileUploadService } from './file-upload.service';
+import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import * as io from 'socket.io-client';
+import { NotificationService } from '../core/services/notification/notification.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-file-upload',
@@ -10,41 +11,46 @@ import { FileUploadService } from './file-upload.service';
   styleUrls: ['./file-upload.component.css']
 })
 export class FileUploadComponent {
-/*   uploadSaveUrl = "saveUrl"; // should represent an actual API endpoint
-  uploadRemoveUrl = "removeUrl"; // should represent an actual API endpoint
-  restrictions: FileRestrictions = {
-    allowedExtensions: [".xlxs", ".xls"],
-  }; */
-  private file: File | undefined;
+  private files: File | undefined;
 
-  constructor(private http: HttpClient) {
+  private socket: any;
+  private messages: string[];
 
-  }
-  /* public remove(upload: any, uid: string) {
-    upload.removeFilesByUid(uid);
+  constructor(private http: HttpClient, private notificationService: NotificationService, private router: Router) {
+    this.socket = io.connect('http://localhost:8080');
   }
 
-  public showButton(state: FileState): boolean {
-    return state === FileState.Uploaded ? true : false;
-  } */
+  ngOnInit(): void {
+    this.messages = new Array();
+
+    this.socket.on("connect", () => {
+      console.log(`connect ${this.socket.id}`);
+    });
+
+    this.socket.on("disconnect", () => {
+      console.log(`disconnect`);
+    });
+    
+    this.socket.on('message', (msg: any) => {
+      this.messages.push(msg);
+      this.notificationService.show(msg);
+
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router.onSameUrlNavigation = 'reload';
+      this.router.navigate(['/home']);
+    });
+}
 
   public onSubmit() {
     const formData: FormData = new FormData();   
-    formData.append('file', this.file!, this.file!.name); 
+    formData.append('file', this.files!, this.files!.name); 
 
-    this.http.post("http://localhost:4000/student-file/upload", formData)
-    .subscribe((response) => {
-    });
+    this.http.post("http://localhost:4000/student-file/upload", formData).subscribe(() => {});
   }
   
   public onFileChange(fileChangeEvent: Event) {
     const target = fileChangeEvent.target as HTMLInputElement;
     const files = target.files as FileList;
-    this.file = files[0];
+    this.files = files[0];
   }
-
-  private async upload(file: any) {
-    
-  }
-
 }

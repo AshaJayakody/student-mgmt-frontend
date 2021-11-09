@@ -10,7 +10,7 @@ export class GraphqlService {
   constructor(private apollo: Apollo) {}
 
   async executeQuery(query: any) {
-    return this.apollo.watchQuery<any>(query).valueChanges.pipe(take(1)).toPromise();
+    return this.apollo.watchQuery(query).valueChanges.pipe(take(1)).toPromise();
   }
 
   executeMutation(mutation: any): Observable<any> {

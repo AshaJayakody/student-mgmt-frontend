@@ -15,8 +15,12 @@ import { GridModule } from '@progress/kendo-angular-grid';
 import { StudentsComponent } from './students/students.component';
 import { IconsModule } from '@progress/kendo-angular-icons';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
-import { GraphqlModule } from './core/graphql.module';
-import { GraphqlService } from './core/services/graphql.service';
+import { GraphqlModule } from './core/modules/graphql/graphql.module';
+import { ToastrModule } from 'ngx-toastr';
+import { NotificationModule } from '@progress/kendo-angular-notification';
+import { DialogsModule } from '@progress/kendo-angular-dialog';
+
+
 
 @NgModule({
   declarations: [
@@ -36,7 +40,16 @@ import { GraphqlService } from './core/services/graphql.service';
     GridModule,
     IconsModule,
     DateInputsModule,
-    GraphqlModule
+    GraphqlModule,
+    ToastrModule.forRoot(
+      {
+        timeOut: 10000,
+        positionClass: "toast-top-right",
+
+      }
+    ),
+    NotificationModule,
+    DialogsModule
   ],
   providers:[],
   bootstrap: [AppComponent]

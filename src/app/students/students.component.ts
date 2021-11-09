@@ -1,17 +1,21 @@
 import { Observable } from "rxjs";
 import { Component, OnInit } from "@angular/core";
+import * as _ from 'lodash';
 
 import { GridComponent, GridDataResult } from "@progress/kendo-angular-grid";
-import { State } from "@progress/kendo-data-query";
+import { State, process } from "@progress/kendo-data-query";
 
 import { Student } from "./student";
-import { GraphqlService } from "../core/services/graphql.service";
 import { formatDate } from "@angular/common";
 import { durationInYears } from '@progress/kendo-date-math';
 import { GET_ALL_STUDENTS } from "./query/get-all-student-query";
 import REMOVE_STUDENT from "./query/remove-student-mutation";
 import UPDATE_STUDENT from "./query/update-student-mutation";
 import { UpdateStudentInput } from "./inputs/update-student.input";
+import { DialogRef, DialogService } from "@progress/kendo-angular-dialog";
+import { map } from "rxjs/operators";
+import { StudentService } from "./student.service";
+import { GraphqlService } from "../core/modules/graphql/graphql.service";
 
 
 @Component({
@@ -20,7 +24,7 @@ import { UpdateStudentInput } from "./inputs/update-student.input";
   styleUrls: ['./students.component.css']
 })
 export class StudentsComponent implements OnInit {
-    public view: Observable<GridDataResult>[];
+    public view: Observable<GridDataResult>;
     public originalItems: any[];
     public gridState : State = {
         sort: [],
@@ -34,7 +38,7 @@ export class StudentsComponent implements OnInit {
     private editedRowIndex: number | undefined;
     private editedStudent: Student | undefined;
 
-    constructor(private gqlService:GraphqlService) {
+    constructor(private gqlService:GraphqlService, private studentService:StudentService) {
     }
 
     public ngOnInit(){
@@ -88,7 +92,6 @@ export class StudentsComponent implements OnInit {
     }
 
     public removeHandler({dataItem}: any) {
-
       this.gqlService.executeMutation({
         mutation : REMOVE_STUDENT,
         variables: {
@@ -110,7 +113,7 @@ export class StudentsComponent implements OnInit {
 
     private closeEditor(grid: GridComponent, rowIndex = this.editedRowIndex): void {
         grid.closeRow(rowIndex);
-        //this.editService.resetItem(this.editedStudent);
+        this.resetItem(this.editedStudent);
         this.editedRowIndex = undefined;
         this.editedStudent = undefined;
     }
@@ -130,12 +133,11 @@ export class StudentsComponent implements OnInit {
   }
 
     private async loadData(){
-        this.view = [];
         this.originalItems = [];
         
         this.gqlService.executeQuery(GET_ALL_STUDENTS).then(
-            (gqlResult) => {
-              gqlResult.data["getAllStudent"].map((student: { id: any; firstName: any; lastName:any; email: any; dateOfBirth: any; }) => {
+            (gqlResult: any) => {
+              gqlResult.data["getAllStudent"].map((student: Student) => {
                 this.originalItems.push({
                   id: student.id,
                   firstName: student.firstName,
@@ -144,10 +146,12 @@ export class StudentsComponent implements OnInit {
                   dateOfBirth: formatDate(new Date(student.dateOfBirth), this.dateformat, this.locale),
                   age: this.calculateAge(new Date(student.dateOfBirth))
                 });
-
-                this.view = this.originalItems.sort(item => item.id);
-                console.log("successfully loaded");
               });
+
+              this.originalItems = _.sortBy(this.originalItems, 'id'); 
+              this.view = this.studentService.pipe(
+                map(() => process(this.originalItems, this.gridState)),
+              );
             },
           ).catch((e) => {
             console.log("error in fetching students");         

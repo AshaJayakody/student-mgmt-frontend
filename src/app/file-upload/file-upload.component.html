@@ -1,24 +1,4 @@
-<!-- <kendo-upload
-      #fileUpload="kendoUpload"
-      [autoUpload]="false"
-      [saveUrl]="uploadSaveUrl"
-      [removeUrl]="uploadRemoveUrl"
-      [restrictions]="restrictions"
-    >
-      <ng-template kendoUploadFileTemplate let-files let-state="state">
-        <div>Name: {{ files[0].name }} Size: {{ files[0].size }} bytes</div>
-        <button
-          *ngIf="showButton(state)"
-          (click)="remove(fileUpload, files[0].uid)"
-          class="k-button"
-          style="position: absolute; right: .2em;"
-        >
-          Remove
-        </button>
-      </ng-template>
-    </kendo-upload> -->
-
-    <div>
-      <input type="file" class="file-input" (change)="onFileChange($event)" />
-      <button type="submit" (click)="onSubmit()">Upload</button>
-  </div>
+<div>
+  <input type="file" class="file-input" (change)="onFileChange($event)" />
+  <button type="submit" (click)="onSubmit()">Upload</button>
+</div>

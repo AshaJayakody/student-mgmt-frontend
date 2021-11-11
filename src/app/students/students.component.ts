@@ -2,7 +2,7 @@ import { Observable } from "rxjs";
 import { Component, OnInit } from "@angular/core";
 import * as _ from 'lodash';
 
-import { GridComponent, GridDataResult } from "@progress/kendo-angular-grid";
+import { GridDataResult } from "@progress/kendo-angular-grid";
 import { State, process } from "@progress/kendo-data-query";
 
 import { Student } from "./student";
@@ -35,8 +35,8 @@ export class StudentsComponent implements OnInit {
     private dateformat:string = 'yyyy-MM-dd';
     private locale:string = 'en-US';
 
-    private editedRowIndex: number | undefined;
-    private editedStudent: Student | undefined;
+    editedRowIndex: number | undefined;
+    editedStudent: Student | undefined;
 
     constructor(private gqlService:GraphqlService, private studentService:StudentService) {
     }
@@ -47,10 +47,9 @@ export class StudentsComponent implements OnInit {
 
     public onStateChange(state: State) {
         this.gridState = state;
-        console.log("grid state changed", state);
     }
 
-    public editHandler({sender, rowIndex, dataItem}: {sender: GridComponent , rowIndex: number, dataItem: any}) {
+    public editHandler({sender, rowIndex, dataItem}: {sender: any , rowIndex: number, dataItem: any}) {
         this.closeEditor(sender);
 
         this.editedRowIndex = rowIndex;
@@ -59,11 +58,11 @@ export class StudentsComponent implements OnInit {
         sender.editRow(rowIndex);
     }
 
-    public cancelHandler({sender, rowIndex}: {sender : GridComponent, rowIndex: number}) {
+    public cancelHandler({sender, rowIndex}: {sender : any, rowIndex: number}) {
         this.closeEditor(sender, rowIndex);
     }
 
-    public saveHandler({sender, rowIndex, dataItem, isNew}: {sender: any, rowIndex: number, dataItem: Student, isNew: boolean}) {
+    public saveHandler({sender, rowIndex, dataItem, isNew}: {sender: any, rowIndex: number, dataItem: any, isNew: boolean}) {
       let updateStudentInput: UpdateStudentInput = this.generateUpdateStudentInput(dataItem.id, dataItem.firstName, dataItem.lastName, dataItem.email, dataItem.dateOfBirth);
 
       this.gqlService.executeMutation({
@@ -110,14 +109,14 @@ export class StudentsComponent implements OnInit {
       );
     }
 
-    private closeEditor(grid: GridComponent, rowIndex = this.editedRowIndex): void {
+    public closeEditor(grid: any, rowIndex = this.editedRowIndex): void {
         grid.closeRow(rowIndex);
         this.resetItem(this.editedStudent);
         this.editedRowIndex = undefined;
         this.editedStudent = undefined;
     }
 
-    private resetItem(dataItem: any){
+    public resetItem(dataItem: any){
       if (!dataItem) {
           return;
         }
@@ -131,7 +130,7 @@ export class StudentsComponent implements OnInit {
         Object.assign(originalDataItem, dataItem);
   }
 
-    private async loadData(){
+    public async loadData(){
         this.originalItems = [];
         
         this.gqlService.executeQuery(GET_ALL_STUDENTS).then(
@@ -157,7 +156,7 @@ export class StudentsComponent implements OnInit {
           });
     }
 
-    private calculateAge(dateOfBirth: Date): number{
+    public calculateAge(dateOfBirth: Date): number{
       let today = new Date();
       let ageCompleteDate = new Date(today.getFullYear(), dateOfBirth.getMonth(), dateOfBirth.getDate());
       let yearGap = durationInYears(dateOfBirth, today);
@@ -169,7 +168,7 @@ export class StudentsComponent implements OnInit {
       return yearGap;
     }
 
-    private generateUpdateStudentInput (id: number, firstName: string, lastName: string, email: string, dateOfBirth: Date): UpdateStudentInput{
+    public generateUpdateStudentInput (id: number, firstName: string, lastName: string, email: string, dateOfBirth: Date): UpdateStudentInput{
       let updateStudentInput: UpdateStudentInput = new UpdateStudentInput();
       updateStudentInput.id = id;
       updateStudentInput.firstName = firstName;

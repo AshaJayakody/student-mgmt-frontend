@@ -17,7 +17,7 @@ export class FileUploadComponent {
   private messages: string[];
 
   constructor(private http: HttpClient, private notificationService: NotificationService, private router: Router) {
-    this.socket = io.connect('http://localhost:8080');
+      this.socket = io.connect('http://localhost:8080');
   }
 
   ngOnInit(): void {
@@ -52,5 +52,9 @@ export class FileUploadComponent {
     const target = fileChangeEvent.target as HTMLInputElement;
     const files = target.files as FileList;
     this.files = files[0];
+  }
+  
+  ngOnDestroy(): void {
+    this.socket.disconnect();
   }
 }

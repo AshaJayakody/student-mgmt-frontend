@@ -47,6 +47,7 @@ export class StudentsComponent implements OnInit {
 
     public onStateChange(state: State) {
         this.gridState = state;
+        this.loadData();
     }
 
     public editHandler({sender, rowIndex, dataItem}: {sender: any , rowIndex: number, dataItem: any}) {
